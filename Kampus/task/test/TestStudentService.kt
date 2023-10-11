@@ -4,14 +4,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.junit.jupiter.api.TestInstance
-import kotlin.random.Random
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class Test {
+class TestStudentService {
     private val baseUrl = "http://localhost:8000"
     private val client = HttpClient()
 
@@ -62,34 +59,19 @@ class Test {
         assertContains(response.bodyAsText(), groupName)
     }
 
-    private fun random(prefix: String) = "$prefix #${Random.nextInt(100, 1000)}"
-
     private suspend fun createStudent(name: String): HttpResponse {
         val email = name.takeLastWhile { it != '#' }
         val request = """{"name": "$name", "email": "$email@mail.com"}"""
-        return client.post("$baseUrl/students") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
+        return client.sendJson("$baseUrl/students", request)
     }
 
     private suspend fun createGroup(name: String): HttpResponse {
         val request = """{"name": "$name"}"""
-        return client.post("$baseUrl/groups") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
+        return client.sendJson("$baseUrl/groups", request)
     }
 
     private suspend fun joinGroup(groupId: Int, studentId: Int): HttpResponse {
         val request = """{"studentId": "$studentId"}"""
-        return client.post("$baseUrl/groups/$groupId/join") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
+        return client.sendJson("$baseUrl/groups/$groupId/join", request)
     }
-
-    private suspend fun getId(response: HttpResponse) =
-        Regex(""""id": (\d+)""").find(response.bodyAsText())
-            ?.groups?.lastOrNull()?.value?.toIntOrNull() ?: -1
 }
