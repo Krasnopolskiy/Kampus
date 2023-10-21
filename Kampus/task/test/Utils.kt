@@ -4,6 +4,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlin.random.Random
 
+const val NON_EXISTENT_ID = 1000
+const val INVALID_ID = "invalid"
 
 suspend fun HttpClient.sendJson(url: String, request: String): HttpResponse {
     return post(url) {

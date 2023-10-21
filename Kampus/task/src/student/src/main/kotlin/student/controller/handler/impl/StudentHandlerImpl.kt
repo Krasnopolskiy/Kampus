@@ -23,8 +23,7 @@ class StudentHandlerImpl : StudentHandler, KoinComponent {
         call.respond(response)
     }
 
-    override suspend fun findById(call: ApplicationCall) {
-        val id = call.parameters["id"]?.toInt() ?: 0
+    override suspend fun findById(call: ApplicationCall, id: Int) {
         val response = service.findById(id)
         call.respond(response)
     }

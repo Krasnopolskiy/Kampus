@@ -1,9 +1,7 @@
 package student
 
 import io.ktor.server.application.*
-import student.plugin.configureContentNegotiation
-import student.plugin.configureKoin
-import student.plugin.configureRouting
+import student.plugin.*
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -12,6 +10,9 @@ fun main(args: Array<String>) {
 @Suppress("unused")
 fun Application.module() {
     configureContentNegotiation()
+    configureRequestValidation()
     configureKoin()
+    installResources()
     configureRouting()
+    configureStatusPages()
 }

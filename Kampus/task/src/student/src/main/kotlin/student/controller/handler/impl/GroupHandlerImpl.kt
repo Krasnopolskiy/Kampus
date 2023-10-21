@@ -24,8 +24,7 @@ class GroupHandlerImpl : GroupHandler, KoinComponent {
         call.respond(response)
     }
 
-    override suspend fun join(call: ApplicationCall) {
-        val id = call.parameters["id"]?.toInt() ?: 0
+    override suspend fun join(call: ApplicationCall, id: Int) {
         val request = call.receive<JoinRequest>()
         val response = service.join(id, request)
         call.respond(response)

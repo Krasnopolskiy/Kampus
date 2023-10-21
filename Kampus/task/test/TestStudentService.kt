@@ -21,6 +21,14 @@ class TestStudentService {
     }
 
     @Test
+    fun `Student can be fetched`() = runBlocking {
+        val name = random("Student")
+        val id = getId(createStudent(name))
+        val response = client.get("$baseUrl/students/$id")
+        assertContains(response.bodyAsText(), name)
+    }
+
+    @Test
     fun `Students can be listed`() = runBlocking {
         val name = random("Student").also { createStudent(it) }
         val response = client.get("$baseUrl/students")
@@ -57,6 +65,49 @@ class TestStudentService {
         joinGroup(groupId, studentId)
         val response = client.get("$baseUrl/students/$studentId")
         assertContains(response.bodyAsText(), groupName)
+    }
+
+    @Test
+    fun `Student with empty name cannot be created`() = runBlocking {
+        val request = """{"name": "", "email": "mock@mail.com"}"""
+        val response = client.sendJson("$baseUrl/students", request)
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertContains(response.bodyAsText(), "Student name cannot be empty")
+    }
+
+    @Test
+    fun `Student with empty email cannot be created`() = runBlocking {
+        val request = """{"name": "mock", "email": ""}"""
+        val response = client.sendJson("$baseUrl/students", request)
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertContains(response.bodyAsText(), "Student email cannot be empty")
+    }
+
+    @Test
+    fun `Non-existent student cannot be fetched`() = runBlocking {
+        val response = client.get("$baseUrl/students/$NON_EXISTENT_ID")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `Student with invalid id cannot be fetched`() = runBlocking {
+        val response = client.get("$baseUrl/students/$INVALID_ID")
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `Group with empty name cannot be created`() = runBlocking {
+        val request = """{"name": ""}"""
+        val response = client.sendJson("$baseUrl/groups", request)
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertContains(response.bodyAsText(), "Group name cannot be empty")
+    }
+
+    @Test
+    fun `Student cannot join non-existent group`() = runBlocking {
+        val studentId = getId(createStudent(random("Student")))
+        val response = joinGroup(NON_EXISTENT_ID, studentId)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     private suspend fun createStudent(name: String): HttpResponse {

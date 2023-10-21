@@ -1,5 +1,6 @@
 package student.service.impl
 
+import io.ktor.server.plugins.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import student.database.entity.Student
@@ -27,7 +28,7 @@ class StudentServiceImpl : StudentService, KoinComponent {
     }
 
     override fun findById(id: Int): StudentFullResponse {
-        val student = students.find { it.id == id } ?: throw Exception("Not found")
+        val student = students.find { it.id == id } ?: throw NotFoundException()
         val groups = groupService.findByStudent(id)
         return mapper.asFullResponse(student, groups)
     }

@@ -1,5 +1,6 @@
 package schedule.service.impl
 
+import io.ktor.server.plugins.*
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -24,7 +25,7 @@ class LessonServiceImpl : LessonService, KoinComponent {
     }
 
     override fun findById(id: Int): LessonResponse {
-        val lesson = lessons.find { it.id == id } ?: throw Exception("Not found")
+        val lesson = lessons.find { it.id == id } ?: throw NotFoundException()
         val groups = getLessonGroups(lesson)
         return mapper.asResponse(lesson, groups)
     }

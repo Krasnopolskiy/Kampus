@@ -1,5 +1,6 @@
 package student.service.impl
 
+import io.ktor.server.plugins.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import student.database.entity.Group
@@ -29,7 +30,7 @@ class GroupServiceImpl : GroupService, KoinComponent {
 
     override fun join(id: Int, request: JoinRequest): JoinResponse {
         if (id !in groups.indices)
-            throw Exception("Not found")
+            throw NotFoundException()
         val studentGroup = mapper.asEntity(request.studentId, id)
         studentGroups.add(studentGroup)
         return JoinResponse(joined = true)

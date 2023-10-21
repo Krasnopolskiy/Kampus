@@ -1,9 +1,11 @@
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 
 
 class TestScheduleService {
@@ -34,6 +36,26 @@ class TestScheduleService {
         val lessonId = getId(createLesson(random("Lesson"), listOf(groupId)))
         val response = client.get("$baseScheduleUrl/lessons/$lessonId")
         assertContains(response.bodyAsText(), groupName)
+    }
+
+    @Test
+    fun `Lesson with empty name cannot be created`() = runBlocking {
+        val request = """{"name": "", "groupIds": []}"""
+        val response = client.sendJson("$baseScheduleUrl/lessons", request)
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertContains(response.bodyAsText(), "Lesson name cannot be empty")
+    }
+
+    @Test
+    fun `Non-existent lesson cannot be fetched`() = runBlocking {
+        val response = client.get("$baseScheduleUrl/lessons/$NON_EXISTENT_ID")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `Lesson with invalid id cannot be fetched`() = runBlocking {
+        val response = client.get("$baseScheduleUrl/lessons/$INVALID_ID")
+        assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
     private suspend fun createGroup(name: String): HttpResponse {

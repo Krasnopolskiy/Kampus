@@ -6,6 +6,6 @@ import student.controller.router.groupRouting
 import student.controller.router.studentRouting
 
 fun Application.configureRouting() = routing {
-    route("/students") { studentRouting() }
-    route("/groups") { groupRouting() }
+    studentRouting()
+    groupRouting()
 }
