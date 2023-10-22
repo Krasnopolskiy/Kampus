@@ -4,6 +4,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import java.util.*
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
@@ -56,6 +57,18 @@ class TestScheduleService {
     fun `Lesson with invalid id cannot be fetched`() = runBlocking {
         val response = client.get("$baseScheduleUrl/lessons/$INVALID_ID")
         assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `Logs can be fetched`() = runBlocking {
+        val path = UUID.randomUUID().toString()
+        val requestId = UUID.randomUUID().toString()
+        client.get("$baseScheduleUrl/$path") {
+            headers { append("Request-Id", requestId) }
+        }
+        val response = client.get("$baseScheduleUrl/logs").bodyAsText()
+        assertContains(response, path)
+        assertContains(response, requestId)
     }
 
     private suspend fun createGroup(name: String): HttpResponse {

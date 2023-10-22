@@ -15,4 +15,5 @@ fun Application.module() {
     configureResources()
     configureRouting()
     configureStatusPages()
+    configureCallLogging()
 }

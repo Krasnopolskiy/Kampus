@@ -4,6 +4,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import java.util.*
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
@@ -108,6 +109,18 @@ class TestStudentService {
         val studentId = getId(createStudent(random("Student")))
         val response = joinGroup(NON_EXISTENT_ID, studentId)
         assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `Logs can be fetched`() = runBlocking {
+        val path = UUID.randomUUID().toString()
+        val requestId = UUID.randomUUID().toString()
+        client.get("$baseUrl/$path") {
+            headers { append("Request-Id", requestId) }
+        }
+        val response = client.get("$baseUrl/logs").bodyAsText()
+        assertContains(response, path)
+        assertContains(response, requestId)
     }
 
     private suspend fun createStudent(name: String): HttpResponse {
