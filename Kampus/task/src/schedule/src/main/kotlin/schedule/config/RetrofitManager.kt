@@ -6,8 +6,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import schedule.service.StudentService
 
 object RetrofitManager {
+    private val studentHost = System.getenv("STUDENT_HOST") ?: "localhost"
+
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://localhost:8000")
+        .baseUrl("http://$studentHost:8000")
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
         .build()
 

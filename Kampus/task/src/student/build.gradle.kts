@@ -23,6 +23,14 @@ repositories {
     mavenCentral()
 }
 
+ktor {
+    docker {
+        localImageName.set("kampus-student-service")
+        imageTag.set("1.0.0")
+        jreVersion.set(JavaVersion.VERSION_17)
+    }
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
